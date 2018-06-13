@@ -1,6 +1,11 @@
 from reconstructree.data.patches import *
 
 
+def regularpatches(tensor, patchsize, stride=None):
+    o = regularorigins(shape(tensor), stride)
+    return patches(tensor, o, patchsize)
+
+
 def randpatch(tensor, patchsize, threshold=None):
     o = randorigin(shape(tensor))
     p = Patch(tensor, o, patchsize)
@@ -42,3 +47,10 @@ def randorigin(tensorshape):
 
 def randorigins(tensorshape, nborigins):
     return array([randorigin(tensorshape) for i in range(nborigins)])
+
+
+def regularorigins(tensorshape, stride, sorted=True):
+    s = (stride,) * len(tensorshape) if isinstance(stride, int) else stride
+    r = [arange(0, v, s[i]) for i, v in enumerate(tensorshape)]
+    o = array(meshgrid(*r)).T.reshape(-1, len(tensorshape))
+    return o[lexsort(transpose(o)[::-1])] if sorted else o

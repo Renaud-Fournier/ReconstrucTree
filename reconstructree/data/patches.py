@@ -17,3 +17,18 @@ class Patch:
 
 def toinput(patches):
     return array([patch.to_nn_format() for patch in patches])
+
+
+def patches_from_nn_format(output, origins):
+    squeeze(output, axis=len(shape(output)))
+
+
+def totensor(patches, tensorshape):
+    tensorlist = full(tensorshape, type("", (), dict(list=[0])))
+    for p in patches:
+        for i, v in ndenumerate(p.tensor):
+            tensorlist[p.origin + i].list.append(v)
+    tensor = zeros(tensorshape)
+    for i, obj in ndenumerate(tensorlist):
+        tensor[i] = sum(obj.list) / len(obj.list)
+    return tensor

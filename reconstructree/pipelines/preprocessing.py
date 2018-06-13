@@ -1,7 +1,7 @@
 from reconstructree.persistence.loading import *
 from reconstructree.data.tensors import *
 from reconstructree.data.patches import *
-from reconstructree.data.sets import *
+from reconstructree.data.pointsets import *
 
 import os
 
