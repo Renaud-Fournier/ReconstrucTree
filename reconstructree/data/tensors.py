@@ -8,16 +8,16 @@ def regularpatches(tensor, patchsize, stride=None):
 
 def randpatch(tensor, patchsize, threshold=None):
     o = randorigin(shape(tensor))
-    p = Patch(tensor, o, patchsize)
+    p = Patch.from_tensor(tensor, o, patchsize)
     if threshold:
         while count_nonzero(p.tensor) < threshold:
             o = randorigin(shape(tensor))
-            p = Patch(tensor, o, patchsize)
+            p = Patch.from_tensor(tensor, o, patchsize)
     return p
 
 
 def samepatch(tensors, origin, patchsize):
-    return [Patch(tensor, origin, patchsize) for tensor in tensors]
+    return [Patch.from_tensor(tensor, origin, patchsize) for tensor in tensors]
 
 
 def samerandpatch(tensors, patchsize, threshold=None, target=0):
@@ -26,7 +26,7 @@ def samerandpatch(tensors, patchsize, threshold=None, target=0):
 
 
 def patches(tensor, origins, patchsize):
-    return [Patch(tensor, origin, patchsize) for origin in origins]
+    return [Patch.from_tensor(tensor, origin, patchsize) for origin in origins]
 
 
 def randpatches(tensor, nbpatches, patchsize, threshold=None):
@@ -54,3 +54,8 @@ def regularorigins(tensorshape, stride, sorted=True):
     r = [arange(0, v, s[i]) for i, v in enumerate(tensorshape)]
     o = array(meshgrid(*r)).T.reshape(-1, len(tensorshape))
     return o[lexsort(transpose(o)[::-1])] if sorted else o
+
+
+def topointset(tensor, voxelsize, bbx, threshold=0):
+    pointset = [array(i) * voxelsize + bbx[0] for i, v in ndenumerate(tensor) if v > threshold]
+    return pointset

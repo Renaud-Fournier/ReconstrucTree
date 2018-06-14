@@ -63,3 +63,9 @@ def savetrain(directory, config, model, history):
     savesummary(directory, model)
     savehistory(directory, history)
     savehistplot(directory, history)
+
+
+def savepointset(path, pointset):
+    with open(path, "w") as f:
+        for p in pointset:
+            f.write(' '.join(map(str, p)) + '\n')

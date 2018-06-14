@@ -22,3 +22,4 @@ def totensor(pointset, bbx, voxelsize, dtype=int):
 
 def totensors(pointsets, bbx, voxelsize, dtype=int):
     return [totensor(ps, bbx, voxelsize, dtype=dtype) for ps in pointsets]
+
