@@ -2,7 +2,9 @@ from reconstructree.data.patches import *
 
 
 def regularpatches(tensor, patchsize, stride=None):
-    o = regularorigins(shape(tensor), stride)
+    s = patchsize if not stride else (
+        (stride,) * len(patchsize) if isinstance(stride, int) else stride)
+    o = regularorigins(shape(tensor), s)
     return patches(tensor, o, patchsize)
 
 

@@ -1,4 +1,5 @@
 from keras import backend as K
+from keras.optimizers import Adam
 
 
 def dice_coef(y_true, y_pred, smooth=1):

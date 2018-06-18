@@ -1,8 +1,8 @@
 
 
-def fit1(model, input, output, nbepochs, batchsize, verbose):
+def fit1(model, input, output, nbepochs, batchsize, verbose=2):
     hist = model.fit(input, output, batch_size=batchsize, epochs=nbepochs, verbose=verbose, shuffle=True, validation_split=.1)
-    return hist.history
+    return hist
 
 
 def fit2(model, input, output, nbepochs, batchsize, splitsize):

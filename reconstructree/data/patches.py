@@ -47,3 +47,19 @@ def tensor_from_patches(patches, tensorshape):
     for i, v in ndenumerate(tensorlist):
         if v.list: tensor[i] = sum(v.list) / len(v.list)
     return tensor
+
+
+def fast_tensor_from_patches(patches, tensorshape):
+    tensor = zeros(tensorshape)
+    for patch in patches:
+        merge(tensor, patch)
+    return tensor
+
+
+def merge(tensor, patch):
+    dim = len(shape(tensor))
+    to, ts, po, ps = (0,) * dim, shape(tensor), patch.origin, shape(patch.tensor)
+    to, ts, po, ps = map(array, (to, ts, po, ps)) #array(to), array(ts), array(po), array(ps)
+    tbot, ttop, pbot, ptop = maximum(to, po), minimum(ts, po + ps), maximum(to, - po), minimum(ps, - po + ts)
+    tslice, pslice = [slice(tbot[i], ttop[i]) for i in range(dim)], [slice(pbot[i], ptop[i]) for i in range(dim)]
+    tensor[tslice] = patch.tensor[pslice]
