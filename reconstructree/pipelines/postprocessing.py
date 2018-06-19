@@ -1,5 +1,4 @@
 from reconstructree.data.tensors import *
-from reconstructree.data.pointsets import *
 from reconstructree.data.patches import *
 
 

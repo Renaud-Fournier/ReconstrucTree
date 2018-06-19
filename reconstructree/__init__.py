@@ -18,6 +18,8 @@ from reconstructree.model.fits import *
 
 from reconstructree.visualisation.gui import *
 
-from reconstructree.pipelines import *
+from reconstructree.pipelines.preprocessing import *
+from reconstructree.pipelines.postprocessing import *
+
 
 
