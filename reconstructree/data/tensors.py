@@ -1,4 +1,4 @@
-from reconstructree.data.patches import *
+from reconstructree.data.patch import *
 
 
 # run through the entire tensor and regularly extract patches of dimension patchsize

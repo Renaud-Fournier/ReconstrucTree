@@ -1,5 +1,5 @@
 from reconstructree.data.tensors import *
-from reconstructree.data.patches import *
+from reconstructree.data.patch import *
 
 
 # return a pointset created from neural network output

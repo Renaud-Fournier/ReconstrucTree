@@ -10,7 +10,7 @@ from reconstructree.persistence.saving import *
 
 from reconstructree.data.pointsets import *
 from reconstructree.data.tensors import *
-from reconstructree.data.patches import *
+from reconstructree.data.patch import *
 
 from reconstructree.model.customs import *
 from reconstructree.model.models import *
