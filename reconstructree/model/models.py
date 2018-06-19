@@ -2,24 +2,33 @@ from keras.models import Model
 from keras.layers import *
 
 
-def metalayer(dim, layers, depht=1, degree=1, kernel=32):
-    for d in range(degree): layers.append(globals()["Conv{}D".format(dim)](kernel, 3, activation='relu', padding='same')(layers[-1]))
-    if depht:
-        layers.append(globals()["MaxPooling{}D".format(dim)](pool_size=2)(layers[-1]))
-        metalayer(dim, layers, depht - 1, degree, kernel * 2)
-        layers.append(globals()["UpSampling{}D".format(dim)](size=2)(layers[-1]))
-        layers.append(concatenate([layers[-1], layers[-(depht*(3+2*degree)-degree)]], axis=dim+1))
-        for d in range(degree): layers.append(globals()["Conv{}D".format(dim)](kernel, 3, activation='relu', padding='same')(layers[-1]))
+# return a encoder decoder model
+# depth is the number of image reduction layers (and of corresponding image augmentation layers)
+# degree is the number of successive convolution layers in every convolution phase
+# kernel is ths number of kernel in the convolution phases of layer 0 (divided by 2 at each depth level
 
-
-def metamodel(patchsize, depht=1, degree=1, kernel=32):
+def enco_deco_model(patchsize, depth=1, degree=1, kernel=32):
     dim = len(patchsize)
     layers = [Input((*patchsize, 1))]
-    metalayer(dim, layers, depht=depht, degree=degree, kernel=kernel)
+    enco_deco_layer(dim, layers, depth=depth, degree=degree, kernel=kernel)
     layers.append(globals()["Conv{}D".format(dim)](1, 1, activation='sigmoid')(layers[-1]))
     model = Model(layers[0], layers[-1])
     return model
 
+
+# recursively create the depht layers used in the enco_deco_model
+
+def enco_deco_layer(dim, layers, depth=1, degree=1, kernel=32):
+    for d in range(degree): layers.append(globals()["Conv{}D".format(dim)](kernel, 3, activation='relu', padding='same')(layers[-1]))
+    if depth:
+        layers.append(globals()["MaxPooling{}D".format(dim)](pool_size=2)(layers[-1]))
+        enco_deco_layer(dim, layers, depth - 1, degree, kernel * 2)
+        layers.append(globals()["UpSampling{}D".format(dim)](size=2)(layers[-1]))
+        layers.append(concatenate([layers[-1], layers[-(depth*(3+2*degree)-degree)]], axis=dim+1))
+        for d in range(degree): layers.append(globals()["Conv{}D".format(dim)](kernel, 3, activation='relu', padding='same')(layers[-1]))
+
+
+# return a simple encoder-decoder model
 
 def examplemodel(patchsize):
 

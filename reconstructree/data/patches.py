@@ -1,6 +1,8 @@
 from numpy import *
 
 
+# class associating a tensor to a position
+
 class Patch:
 
     tensor = array([])
@@ -21,17 +23,24 @@ class Patch:
         tensor = squeeze(output, axis=len(shape(output)) - 1)
         return cls(tensor, origin)
 
-    def to_nn_format(self, dtype=float):
-        return self.tensor[..., newaxis].astype(dtype)
+    # convert the patch to neural network input
+    def to_nn_format(self):
+        return self.tensor[..., newaxis].astype(float)
 
+
+# convert an array of Patches to neural network input
 
 def toinput(patches):
     return array([p.to_nn_format() for p in patches])
 
 
+# convert output of neural network to Patches
+
 def patches_from_nn_format(outputs, origins):
     return array([Patch.from_nn_format(v, origins[i]) for i, v in enumerate(outputs)])
 
+
+# create a empty tensor of shape tensorshape and fills it with patches content at their associated origins
 
 def tensor_from_patches(patches, tensorshape):
     tensorlist = empty(tensorshape, dtype=object)
@@ -49,6 +58,8 @@ def tensor_from_patches(patches, tensorshape):
     return tensor
 
 
+# idem but faster for non-overlapping patches
+
 def fast_tensor_from_patches(patches, tensorshape):
     tensor = zeros(tensorshape)
     for patch in patches:
@@ -56,10 +67,12 @@ def fast_tensor_from_patches(patches, tensorshape):
     return tensor
 
 
+# insert a patch inside the given tensor
+
 def merge(tensor, patch):
     dim = len(shape(tensor))
     to, ts, po, ps = (0,) * dim, shape(tensor), patch.origin, shape(patch.tensor)
-    to, ts, po, ps = map(array, (to, ts, po, ps)) #array(to), array(ts), array(po), array(ps)
+    to, ts, po, ps = map(array, (to, ts, po, ps))
     tbot, ttop, pbot, ptop = maximum(to, po), minimum(ts, po + ps), maximum(to, - po), minimum(ps, - po + ts)
     tslice, pslice = [slice(tbot[i], ttop[i]) for i in range(dim)], [slice(pbot[i], ptop[i]) for i in range(dim)]
     tensor[tslice] = patch.tensor[pslice]

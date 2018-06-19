@@ -3,33 +3,38 @@ import json
 import os
 
 
-def savemodel(directory, model):
-    model.save(directory + "model.h5")
+# save a model at the given path (.h5 format)
+
+def savemodel(path, model):
+    model.save(path)
 
 
-def saveconfig(directory, config):
-    with open(directory + "config.json", "w") as f:
-        f.write(json.dumps(config, indent=4))
+# save a model summary at the given path (.txt format)
 
-
-def savesummary(directory, model):
-    with open(directory + "summary.txt", "w") as f:
+def savesummary(path, model):
+    with open(path, "w") as f:
         model.summary(print_fn=lambda x: f.write(x + '\n'))
 
 
-def savehistory(directory, history):
-    with open(directory + "history.json", "w") as f:
+# save a model history at the given path (.json format)
+
+def savehistory(path, history):
+    with open(path, "w") as f:
         f.write(json.dumps(history, indent=4))
 
 
-def savehistplot(directory, history):
+# save a picture of a plotted model history at the given path (.png format)
+
+def savehistplot(path, history):
     ioff()
     showhistory(history, True)
-    savefig(directory + 'histplot.png')
+    savefig(path)
     ion()
 
 
-def savesamples2(path, patches, dimension, nbsamples):
+# save pictures of patches in a "samples" directory at the given path (.png format)
+
+def savesamples(path, patches, dimension, nbsamples):
     ioff()
     for i in range(nbsamples):
         showpatches([patch[i] for patch in patches], dimension)
@@ -37,35 +42,8 @@ def savesamples2(path, patches, dimension, nbsamples):
     ion()
 
 
-def savesamples(directory, scanpatches, skelpatches, predictions, dimension, nbsample=10):
-    ioff()
-    os.makedirs(directory + "samples/", exist_ok=True)
-    for i in range(nbsample):
-        showpatches([scanpatches[i], skelpatches[i], predictions[i]], dimension, True)
-        savefig(directory + "samples/sample" + str(i) + ".png")
-    ion()
-
-
-def saveall(directory, config, model, history, scanpatches, skelpatches, predictions, dimension):
-    os.makedirs(directory, exist_ok=True)
-    savemodel(directory, model)
-    saveconfig(directory, config)
-    savesummary(directory, model)
-    savehistory(directory, history)
-    savehistplot(directory, history)
-    savesamples(directory, scanpatches, skelpatches, predictions, dimension, nbsample=10)
-
-
-def savetrain(directory, config, model, history):
-    os.makedirs(directory, exist_ok=True)
-    savemodel(directory, model)
-    saveconfig(directory, config)
-    savesummary(directory, model)
-    savehistory(directory, history)
-    savehistplot(directory, history)
-
+# save a pointset at the given path (.txt format)
 
 def savepointset(path, pointset):
     with open(path, "w") as f:
-        for p in pointset:
-            f.write(' '.join(map(str, p)) + '\n')
+        for p in pointset: f.write(' '.join(map(str, p)) + '\n')

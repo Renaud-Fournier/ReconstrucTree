@@ -3,6 +3,8 @@ from matplotlib.pyplot import *
 from mpl_toolkits.mplot3d import Axes3D
 
 
+# display a MatPlotLib scatter plot for each patch in patches, all inside the same figure
+
 def showpatches(patches, dimension, clearprevious=True):
     if clearprevious: close("all")
     f = figure(figsize=(4.5 * len(patches), 4))
@@ -12,6 +14,8 @@ def showpatches(patches, dimension, clearprevious=True):
         ax.scatter(*[data[:, d] for d in range(dimension)], s=data[:, dimension] * 10)
     if isinteractive(): show()
 
+
+# display plotted curves of the history keys (error, precision ...)
 
 def showhistory(hist, clearprevious=True):
     if clearprevious: close("all")

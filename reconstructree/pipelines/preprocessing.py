@@ -6,6 +6,9 @@ import os
 import sys
 
 
+# return neural network training input and references created from patches extracted in a directory at path containing npz files
+# each npz file must contain the arrays "scan", "skel" and "bounds"
+
 def preprocesstrain(path, nbpatches, voxelsize, patchsize):
     file_list = os.listdir(path)
     input, output = [], []
@@ -22,6 +25,9 @@ def preprocesstrain(path, nbpatches, voxelsize, patchsize):
     # print("\n")
     return array(input), array(output)
 
+
+# return neural network input created from patches extracted in a .txt file
+# are also returned the orgins of the patches, the shape of the created tensor and the bounding box of the pointset
 
 def preprocesspredict(path, voxelsize, patchsize):
     pointset = load_txt(path)
