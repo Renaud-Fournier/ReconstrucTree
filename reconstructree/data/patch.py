@@ -1,78 +1,57 @@
 from numpy import *
 
 
-# class associating a tensor to a position
+# class Patch : associate a "value" array to a position in a tensor
 
 class Patch:
 
-    tensor = array([])
-    origin = array([])
-
-    def __init__(self, tensor, origin):
-        self.tensor = array(tensor)
-        self.origin = array(origin)
+    def __init__(self, values, origin):
+        self.values = array(values)  # multi-dim array containing the patch values
+        self.origin = array(origin)  # lower left corner position of the patch in its origin tensor
 
     @classmethod
-    def from_tensor(cls, origintensor, origin, patchsize):
-        patch = array(origintensor[[slice(origin[i], origin[i] + patchsize[i]) for i, v in enumerate(shape(origintensor))]])
-        tensor = pad(patch, [(0, patchsize[i] - d) for i, d in enumerate(shape(patch))], 'constant', constant_values=0)
-        return cls(tensor, origin)
+    def from_tensor(cls, tensor, origin, patchsize):
+
+        # create a Patch of size "patchsize" by extracting the values in a Tensor object
+        # (padded with 0 if the tensor is not big enough or if the origin is outside the tensor
+
+        patch = array(tensor.values[[slice(origin[i], origin[i] + patchsize[i]) for i, v in enumerate(tensor.shape)]])
+        values = pad(patch, [(0, patchsize[i] - d) for i, d in enumerate(shape(patch))], 'constant', constant_values=0)
+        return cls(values, origin)
+
+    @classmethod
+    def from_values(cls, originvalues, origin, patchsize):
+
+        # create a Patch of size "patchsize" by extracting the values in an multi-dim array
+
+        patch = array(originvalues[[slice(origin[i], origin[i] + patchsize[i]) for i, v in enumerate(shape(originvalues))]])
+        values = pad(patch, [(0, patchsize[i] - d) for i, d in enumerate(shape(patch))], 'constant', constant_values=0)
+        return cls(values, origin)
 
     @classmethod
     def from_nn_format(cls, output, origin):
-        tensor = squeeze(output, axis=len(shape(output)) - 1)
-        return cls(tensor, origin)
 
-    # convert the patch to neural network input
+        # create a Patch from the output of the neural network. Origin has to be specified
+
+        values = squeeze(output, axis=len(shape(output)) - 1)
+        return cls(values, origin)
+
     def to_nn_format(self):
-        return self.tensor[..., newaxis].astype(float)
 
+        # convert the Patch to neural network input
 
-# convert an array of Patches to neural network input
+        return self.values[..., newaxis].astype(float)
+
 
 def toinput(patches):
-    return array([p.to_nn_format() for p in patches])
 
+    # convert an array of Patches to neural network input
 
-# convert output of neural network to Patches
+    return array([patch.to_nn_format() for patch in patches])
+
 
 def patches_from_nn_format(outputs, origins):
+
+    # convert output of neural network to Patches
+
     return array([Patch.from_nn_format(v, origins[i]) for i, v in enumerate(outputs)])
-
-
-# create a empty tensor of shape tensorshape and fills it with patches content at their associated origins
-
-def tensor_from_patches(patches, tensorshape):
-    tensorlist = empty(tensorshape, dtype=object)
-    for i, v in ndenumerate(tensorlist): tensorlist[i] = type("numpylist", (), dict(list=[]))
-    for p in patches:
-        for i, v in ndenumerate(p.tensor):
-            o = tuple(p.origin + i)
-            oint = all(greater_equal(o, 0)) and all(greater(tensorshape, o))
-            #print(o, oint)
-            if oint:
-                tensorlist[o].list.append(v)
-    tensor = zeros(tensorshape)
-    for i, v in ndenumerate(tensorlist):
-        if v.list: tensor[i] = sum(v.list) / len(v.list)
-    return tensor
-
-
-# idem but faster for non-overlapping patches
-
-def fast_tensor_from_patches(patches, tensorshape):
-    tensor = zeros(tensorshape)
-    for patch in patches:
-        merge(tensor, patch)
-    return tensor
-
-
-# insert a patch inside the given tensor
-
-def merge(tensor, patch):
-    dim = len(shape(tensor))
-    to, ts, po, ps = (0,) * dim, shape(tensor), patch.origin, shape(patch.tensor)
-    to, ts, po, ps = map(array, (to, ts, po, ps))
-    tbot, ttop, pbot, ptop = maximum(to, po), minimum(ts, po + ps), maximum(to, - po), minimum(ps, - po + ts)
-    tslice, pslice = [slice(tbot[i], ttop[i]) for i in range(dim)], [slice(pbot[i], ptop[i]) for i in range(dim)]
-    tensor[tslice] = patch.tensor[pslice]

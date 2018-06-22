@@ -1,6 +1,6 @@
 
 
-# alternative fit method for to large to be loaded at once data set
+# alternative fit method for too large to be loaded at once data set
 
 def alt_fit(model, input, output, nbepochs, batchsize, splitsize):
     history = {}

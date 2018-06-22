@@ -9,7 +9,7 @@ def savemodel(path, model):
     model.save(path)
 
 
-# save a model summary at the given path (.txt format)
+# save a model summary at the given path (.txt format, as rows of x,y,z coords separated by spaces)
 
 def savesummary(path, model):
     with open(path, "w") as f:
